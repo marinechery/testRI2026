@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartographie RI 2026</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="Cartographie_RI_2026.css" />
+</head>
+<body>
+
+<div id="map"></div>
+
+<!-- Counter -->
+<div id="counter">
+    <span id="count-total">0</span> destinations &nbsp;·&nbsp;
+    <span id="count-erasmus" style="color:var(--blue)">0 Europe – Erasmus</span> &nbsp;·&nbsp;
+    <span id="count-hors" style="color:var(--red)">0 Europe – Hors Erasmus</span> &nbsp;·&nbsp;
+    <span id="count-monde" style="color:var(--green)">0 Hors Europe</span>
+</div>
+
+<!-- Side panel -->
+<div id="panel">
+    <div id="panel-inner">
+        <button id="close-btn" onclick="closePanel()">← Fermer</button>
+        <div id="content"></div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+/* ─────────────────────────────────────────────
+   DONNÉES – ajoute autant d'objets que tu veux
+   Types : "europe-erasmus" | "europe-hors-erasmus" | "hors-europe"
+───────────────────────────────────────────── */
+const universites = [
+    {
+        nom: "Augsburg – Hochschule Augsburg",
+        pays: "Allemagne",
+        coords: [48.35552694661619, 10.904528148877482],
+        type: "europe-erasmus",
+        code: "D AUGSBUR02",
+        verdict: "",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Bayreuth – Universitat Bayreuth",
+        pays: "Allemagne",
+        coords: [49.92643811465807, 11.585248895104833],
+        type: "europe-erasmus",
+        code: "D BAYREUT01",
+        verdict: "",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Berlin – Freie Universitat Berlin",
+        pays: "Allemagne",
+        coords: [52.445153574559306, 13.23619592296127],
+        type: "europe-erasmus",
+        code: "D BERLIN01",
+        verdict: "",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Cologne – Technische Hochschule Koln",
+        pays: "Allemagne",
+        coords: [50.93885669013234, 6.961507267380379],
+        type: "europe-erasmus",
+        code: "D KOLN04",
+        verdict: "",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Erfurt – Universitat Erfurt",
+        pays: "Allemagne",
+        coords: [50.99189262628728, 11.010890320167787],
+        type: "europe-erasmus",
+        code: "D ERFURT05",
+        verdict: "",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Munich – LMU Munich",
+        pays: "Allemagne",
+        coords: [48.15109744884478, 11.579876993253796],
+        type: "europe-erasmus",
+        code: "???????",
+        verdict: "",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Munster – Universitat Munster, School of Business and Economics",
+        pays: "Allemagne",
+        coords: [51.962012184635775, 7.619699877910343],
+        type: "europe-erasmus",
+        code: "D MUNSTER01",
+        verdict: "",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Anvers – Universitat Antwerpen",
+        pays: "Belgique",
+        coords: [51.22296194595281, 4.410169262566893],
+        type: "europe-erasmus",
+        code: "B ANTWERP01",
+        verdict: "",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Bruxelles – Saint-Louis Bruxelles",
+        pays: "Belgique",
+        coords: [50.85307138465338, 4.360249404895168],
+        type: "europe-erasmus",
+        code: "B BRUXEL02",
+        verdict: "",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Bruxelles Louvain – KU Leuven",
+        pays: "Belgique",
+        coords: [50.878239261374596, 4.699710664417942],
+        type: "europe-erasmus",
+        code: "B LEUVEN01",
+        verdict: "",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Blagoevgrad – American University in Bulgaria (AUBG)",
+        pays: "Bulgarie",
+        coords: [42.03127294992846, 23.088552185399553],
+        type: "europe-erasmus",
+        code: "BG BLAGOEV03",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Sofia – Saint Kliment Ohridski",
+        pays: "Bulgarie",
+        coords: [42.69370699817814, 23.33490844907447],
+        type: "europe-erasmus",
+        code: "BG SOFIA06",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Paphos – Neapolis University Pafos",
+        pays: "Chypre",
+        coords: [34.749359246256674, 32.42708882208965],
+        type: "europe-erasmus",
+        code: "CY PAFOS01",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Split – University of Split",
+        pays: "Croatie",
+        coords: [43.51125064362254, 16.46806932023862],
+        type: "europe-erasmus",
+        code: "HR SPLIT01",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Zagreb – VERN University",
+        pays: "Croatie",
+        coords: [45.806056558315284, 15.981929306746206],
+        type: "europe-erasmus",
+        code: "HR ZAGREB10",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Odense – University of Southern Denmark (SDU)",
+        pays: "Danemark",
+        coords: [55.406425445511026, 10.418623352779925],
+        type: "europe-erasmus",
+        code: "DK ODENSE01",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Barcelone – ESCI-UPF",
+        pays: "Espagne",
+        coords: [41.38835108398073, 2.1820737374331065],
+        type: "europe-erasmus",
+        code: "E BARCELO258",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Barcelone – Universitat de Girona – EU Mediterrani (EUM)",
+        pays: "Espagne",
+        coords: [41.405131648702806, 2.161952726645673],
+        type: "europe-erasmus",
+        code: "E GIRONA02",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Barcelone – Universitat Ramon Llull (IQS)",
+        pays: "Espagne",
+        coords: [41.403308353520565, 2.119669420238618],
+        type: "europe-erasmus",
+        code: "?????????",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Cordoue – Universidad Loyola",
+        pays: "Espagne",
+        coords: [37.89003956151984, -4.781289479075204],
+        type: "europe-erasmus",
+        code: "E CORDOBA23",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "La Corogne – Universidade da Coruna",
+        pays: "Espagne",
+        coords: [43.33660592274439, -8.409536062659745],
+        type: "europe-erasmus",
+        code: "E LA-CORU01",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Madrid – CEU San Pablo",
+        pays: "Espagne",
+        coords: [40.44275123527397, -3.717295491402756],
+        type: "europe-erasmus",
+        code: "E MADRID21",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Madrid – Colegio Universitario de Estudios Financieros (CUNEF)",
+        pays: "Espagne",
+        coords: [40.45220793698348, -3.7133098769329846],
+        type: "europe-erasmus",
+        code: "E MADRID236",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Madrid – Universidad Europea de Madrid (UEM)",
+        pays: "Espagne",
+        coords: [40.3850912946297, -3.9173661888338134],
+        type: "europe-erasmus",
+        code: "E MADRID18",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Madrid – Universidad Francisco de Vitoria (UFV)",
+        pays: "Espagne",
+        coords: [40.440053432728234, -3.8339778625669196],
+        type: "europe-erasmus",
+        code: "E MADRID28",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Madrid – Universidad Pontificia Comillas (ICADE)",
+        pays: "Espagne",
+        coords: [40.4297963040217, -3.711184964417922],
+        type: "europe-erasmus",
+        code: "E MADRID02",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Madrid ou Ségovie – IE University",
+        pays: "Espagne",
+        coords: [40.953087773201354, -4.118809577910343],
+        type: "europe-erasmus",
+        code: "E SEGOVIA01",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Salamanque – Universidad Pontificia de Salamanca (UPSA)",
+        pays: "Espagne",
+        coords: [40.96333774174776, -5.666839662566892],
+        type: "europe-erasmus",
+        code: "E SALAMAN01",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Saragosse – Universidad de Zaragoza (UNIZAR)",
+        pays: "Espagne",
+        coords: [41.64216804686975, -0.9014904499458832],
+        type: "europe-erasmus",
+        code: "E ZARAGOZ01",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Séville – Universidad Loyola",
+        pays: "Espagne",
+        coords: [37.30672599970538, -5.9425085038325625],
+        type: "europe-erasmus",
+        code: "E CORDOBA23",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Valence – CEU Cardenal Herrera",
+        pays: "Espagne",
+        coords: [39.54750913128188, -0.3868335485859254],
+        type: "europe-erasmus",
+        code: "E VALENCI08",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Valence – UVC San Vicente Martir",
+        pays: "Espagne",
+        coords: [39.47065410761906, -0.3804553712444997],
+        type: "europe-erasmus",
+        code: "E VALENCI11",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Valence – Universidad de Valencia (UV)",
+        pays: "Espagne",
+        coords: [39.480253430495196, -0.36344297317591895],
+        type: "europe-erasmus",
+        code: "E VALENCI01",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Valence – Universidad Europea de Valencia (UEV)",
+        pays: "Espagne",
+        coords: [39.475595811969754, -0.36525852982138024],
+        type: "europe-erasmus",
+        code: "E VALENCI91",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+    {
+        nom: "Valence – Universitat Politecnica Valencia (UPV)",
+        pays: "Espagne",
+        coords: [39.48089165496956, -0.34112267200148083],
+        type: "europe-erasmus",
+        code: "E VALENCI02",
+        budget: "",
+        integration: "",
+        cours: "",
+        examens: "",
+        logement: "",
+        transport: "",
+        tips: "",
+    },
+];
+
+/* ─────────────────────────────
+   MAP INIT
+───────────────────────────── */
+const initialView = { coords: [30, 10], zoom: 3 };
+const map = L.map('map', { zoomControl: false }).setView(initialView.coords, initialView.zoom);
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    attribution: '© CartoDB',
+    maxZoom: 19
+}).addTo(map);
+
+L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+/* ─────────────────────────────
+   PIN FACTORY
+───────────────────────────── */
+function makeIcon(type) {
+    return L.divIcon({
+        className: 'custom-div-icon',
+        html: `<div class="pin-wrap pin-${type}"><div class="pin-shape"></div></div>`,
+        iconSize: [26, 32],
+        iconAnchor: [13, 32],
+        popupAnchor: [0, -32]
+    });
+}
+
+/* ─────────────────────────────
+   ADD MARKERS
+───────────────────────────── */
+let counts = { 'europe-erasmus': 0, 'europe-hors-erasmus': 0, 'hors-europe': 0 };
+
+universites.forEach(uni => {
+    if (!uni.coords || uni.coords.length !== 2) return;
+    counts[uni.type] = (counts[uni.type] || 0) + 1;
+
+    const marker = L.marker(uni.coords, { icon: makeIcon(uni.type) }).addTo(map);
+    marker.bindTooltip(uni.nom, { direction: 'top', offset: [0, -30], className: 'leaflet-tooltip-custom' });
+    marker.on('click', () => {
+        map.flyTo(uni.coords, 13, { duration: 1.4 });
+        showPanel(uni);
+    });
+});
+
+// Update counter
+document.getElementById('count-total').textContent = universites.length;
+document.getElementById('count-erasmus').textContent = (counts['europe-erasmus'] || 0) + ' Europe – Erasmus';
+document.getElementById('count-hors').textContent = (counts['europe-hors-erasmus'] || 0) + ' Europe – Hors Erasmus';
+document.getElementById('count-monde').textContent = (counts['hors-europe'] || 0) + ' Hors Europe';
+
+/* ─────────────────────────────
+   PANEL LOGIC
+───────────────────────────── */
+const panel = document.getElementById('panel');
+
+function val(v) {
+    return v ? `<span class="info-card-value">${v}</span>`
+             : `<span class="info-card-value empty">Non renseigné</span>`;
+}
+
+function badgeClass(type) {
+    if (type === 'europe-hors-erasmus') return 'badge-hors-erasmus';
+    if (type === 'hors-europe') return 'badge-monde';
+    return 'badge-erasmus';
+}
+function badgeLabel(type) {
+    if (type === 'europe-hors-erasmus') return 'Europe – Hors Erasmus';
+    if (type === 'hors-europe') return 'Hors Europe';
+    return 'Europe – Erasmus';
+}
+
+function showPanel(uni) {
+    const content = document.getElementById('content');
+    content.innerHTML = `
+        <span class="panel-badge ${badgeClass(uni.type)}">${badgeLabel(uni.type)}</span>
+        <h2 class="panel-title">${uni.nom}</h2>
+        <p class="panel-code">${uni.pays || ''}${uni.code ? ' &nbsp;·&nbsp; ' + uni.code : ''}</p>
+
+        <div class="info-grid">
+            <div class="info-card card-gray">
+                <div class="info-card-label label-gray">📋 Verdict global</div>
+                ${val(uni.verdict)}
+            </div>
+            <div class="info-card card-blue">
+                <div class="info-card-label label-blue">💰 Budget</div>
+                ${val(uni.budget)}
+            </div>
+            <div class="info-card card-purple">
+                <div class="info-card-label label-purple">🤝 Intégration</div>
+                ${val(uni.integration)}
+            </div>
+            <div class="info-card card-green">
+                <div class="info-card-label label-green">📚 Cours</div>
+                ${val(uni.cours)}
+            </div>
+            <div class="info-card card-orange">
+                <div class="info-card-label label-orange">📝 Examens</div>
+                ${val(uni.examens)}
+            </div>
+            <div class="info-card card-indigo">
+                <div class="info-card-label label-indigo">🏠 Logement</div>
+                ${val(uni.logement)}
+            </div>
+            <div class="info-card card-cyan">
+                <div class="info-card-label label-cyan">🚌 Transports</div>
+                ${val(uni.transport)}
+            </div>
+            <div class="info-card card-amber">
+                <div class="info-card-label label-amber">💡 Bon à savoir</div>
+                ${val(uni.tips)}
+            </div>
+        </div>
+    `;
+
+    panel.style.width = '440px';
+    panel.classList.add('open');
+}
+
+function closePanel() {
+    panel.classList.remove('open');
+    setTimeout(() => { panel.style.width = '0'; }, 450);
+    map.flyTo(initialView.coords, initialView.zoom, { duration: 1.2 });
+}
+</script>
+</body>
+</html>

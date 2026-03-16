@@ -1,0 +1,202 @@
+/* ── VARIABLES GLOBALES ── */
+:root {
+    --blue:   #2563EB;
+    --red:    #DC2626;
+    --green:  #16A34A;
+    --surface: rgba(255,255,255,0.97);
+    --border:  rgba(0,0,0,0.08);
+    --text-1:  #111827;
+    --text-2:  #6B7280;
+    --text-3:  #9CA3AF;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: #e8edf2; }
+
+/* ── MAP ── */
+#map { position: fixed; inset: 0; z-index: 1; }
+
+/* ── COUNTER ── */
+#counter {
+    position: fixed;
+    top: 20px; left: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 10px 16px;
+    z-index: 900;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    font-size: 13px;
+    color: var(--text-2);
+    font-weight: 500;
+}
+#counter span {
+    color: var(--text-1);
+    font-weight: 600;
+    font-size: 15px;
+}
+
+/* ── SIDE PANEL ── */
+#panel {
+    position: fixed;
+    top: 0; right: 0;
+    height: 100%;
+    width: 0;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    box-shadow: -20px 0 60px rgba(0,0,0,0.1);
+    z-index: 1000;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+}
+#panel::-webkit-scrollbar { width: 4px; }
+#panel::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 99px; }
+
+#panel-inner {
+    width: 440px;
+    padding: 36px 32px 60px;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.3s ease 0.15s, transform 0.3s ease 0.15s;
+}
+#panel.open #panel-inner {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* ── CLOSE BUTTON ── */
+#close-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 6px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all .2s;
+    margin-bottom: 28px;
+}
+#close-btn:hover { background: #f3f4f6; color: var(--text-1); }
+
+/* ── PANEL HEADER ── */
+.panel-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 99px;
+    margin-bottom: 10px;
+}
+.badge-erasmus      { background: #DBEAFE; color: #1D4ED8; }
+.badge-hors-erasmus { background: #FEE2E2; color: #B91C1C; }
+.badge-monde        { background: #DCFCE7; color: #15803D; }
+
+.panel-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-1);
+    line-height: 1.25;
+    margin-bottom: 6px;
+}
+.panel-code {
+    font-size: 12px;
+    color: var(--text-3);
+    font-weight: 500;
+    letter-spacing: .05em;
+    margin-bottom: 28px;
+}
+
+/* ── INFO CARDS ── */
+.info-grid { display: flex; flex-direction: column; gap: 10px; }
+
+.info-card {
+    border-radius: 14px;
+    padding: 14px 16px;
+    border: 1px solid transparent;
+}
+.info-card-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.info-card-value { font-size: 13.5px; color: var(--text-1); line-height: 1.55; }
+.info-card-value.empty { color: var(--text-3); font-style: italic; }
+
+/* Variantes de couleur des cartes */
+.card-gray   { background: #F9FAFB; border-color: #F3F4F6; }
+.card-blue   { background: #EFF6FF; border-color: #DBEAFE; }
+.card-purple { background: #F5F3FF; border-color: #EDE9FE; }
+.card-green  { background: #F0FDF4; border-color: #DCFCE7; }
+.card-orange { background: #FFF7ED; border-color: #FED7AA; }
+.card-indigo { background: #EEF2FF; border-color: #E0E7FF; }
+.card-cyan   { background: #ECFEFF; border-color: #CFFAFE; }
+.card-amber  { background: #FFFBEB; border-color: #FDE68A; }
+
+.label-gray   { color: #6B7280; }
+.label-blue   { color: #2563EB; }
+.label-purple { color: #7C3AED; }
+.label-green  { color: #16A34A; }
+.label-orange { color: #EA580C; }
+.label-indigo { color: #4338CA; }
+.label-cyan   { color: #0891B2; }
+.label-amber  { color: #D97706; }
+
+/* ── PINS ── */
+.pin-wrap {
+    position: relative;
+    width: 26px; height: 26px;
+}
+.pin-shape {
+    width: 26px; height: 26px;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    border: 2.5px solid white;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.28);
+    position: absolute;
+    top: 0; left: 0;
+    transition: transform .2s ease;
+}
+.pin-shape::after {
+    content: '';
+    width: 9px; height: 9px;
+    background: rgba(255,255,255,0.85);
+    position: absolute;
+    border-radius: 50%;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+}
+.pin-europe-erasmus       .pin-shape { background: var(--blue); }
+.pin-europe-hors-erasmus  .pin-shape { background: var(--red); }
+.pin-hors-europe          .pin-shape { background: var(--green); }
+
+/* Hover animation */
+.leaflet-marker-icon:hover .pin-shape { transform: rotate(-45deg) scale(1.2); }
+
+/* ── TOOLTIP LEAFLET CUSTOM ── */
+.leaflet-tooltip-custom {
+    background: rgba(17,24,39,0.9);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+.leaflet-tooltip-custom::before { display: none; }
